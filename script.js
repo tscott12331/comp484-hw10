@@ -1,14 +1,9 @@
 $(function() { // Makes sure that your function is called once all the DOM elements of the page are ready to be used.
 
-        // Called function to update the name, happiness, and weight of our pet in our HTML
-    checkAndUpdatePetInfoInHtml();
+    // Called function to update the name, happiness, and weight of our pet in our HTML
 
     // When each button is clicked, it will "call" function for that button (functions are below)
-    $('.treat-button').click(clickedTreatButton);
-    $('.play-button').click(clickedPlayButton);
-    $('.exercise-button').click(clickedExerciseButton);
-    $('.name-edit-button').click(clickedNameEditButton);
-    $('.name-form').submit(submittedNameForm);
+    addPet();
     $('#add-pet-button').click(clickedAddButton);
 
 
@@ -23,8 +18,10 @@ const INIT_NAME = "My Pet Name"
 const WEIGHT_INC = 1;
 const HAPPINESS_INC = 1;
 
-// Add a variable "pet_info" equal to a object with the name (string), weight (number), and happiness (number) of your pet
 
+const pets = [];
+
+// Add a variable "pet_info" equal to a object with the name (string), weight (number), and happiness (number) of your pet
 const pet_info = {
     name: INIT_NAME,
     weight: MIN_WEIGHT,
@@ -39,16 +36,38 @@ const actions = { // meant to be like an enum
 
 
 function addPet() {
-    
+    const newPetTemplate = $('#pet-template').clone();
+    const newPetEl = $(newPetTemplate).find('.pet-container');
+
+    $('.pets-container').append(newPetEl);
+
+    const newPet = {
+        element: newPetEl,
+        ...pet_info // copy default pet info
+    };
+
+    pets.push(newPet);
+
+    // set event listeners for this specific pet element
+
+    // newPetEl.find('.treat-button').click(clickedTreatButton);
+    // newPetEl.find('.play-button').click(clickedPlayButton);
+    // newPetEl.find('.exercise-button').click(clickedExerciseButton);
+    // newPetEl.find('.name-edit-button').click(clickedNameEditButton);
+    // newPetEl.find('.name-form').submit(submittedNameForm);
+
+    newPetEl.find('.treat-button').on('click', { petEl: newPetEl }, clickedTreatButton);
+    newPetEl.find('.play-button').on('click', { petEl: newPetEl }, clickedPlayButton);
+    newPetEl.find('.exercise-button').on('click', { petEl: newPetEl }, clickedExerciseButton);
+    newPetEl.find('.name-edit-button').on('click', { petEl: newPetEl }, clickedNameEditButton);
+    newPetEl.find('.name-form').on('submit', { petEl: newPetEl }, submittedNameForm);
+
+    checkAndUpdatePetInfoInHtml(newPet.name, 0, 0, newPet.element);
 }
 
 
-function displayAction(action, actionButton) {
-    const actionIndicatorEl = actionButton
-        .parent()
-        .parent()
-        .siblings('.pet-image-container')
-        .find('.action-indicator');
+function displayAction(action, petEl) {
+    const actionIndicatorEl = petEl.find('.action-indicator');
     
     switch(action) {
         case actions.treat:
@@ -73,28 +92,31 @@ function displayAction(action, actionButton) {
 }
 
 
-function clickedTreatButton() {
+function clickedTreatButton(event) {
     // Increase pet happiness
     // Increase pet weight
-    displayAction(actions.treat, $(this));
-    checkAndUpdatePetInfoInHtml(WEIGHT_INC, HAPPINESS_INC);
+    const petEl = event.data.petEl;
+    displayAction(actions.treat, petEl);
+    checkAndUpdatePetInfoInHtml(null, WEIGHT_INC, HAPPINESS_INC, petEl);
 }
 
-function clickedPlayButton() {
+function clickedPlayButton(event) {
     // Increase pet happiness
     // Decrease pet weight
-    displayAction(actions.play, $(this));
-    checkAndUpdatePetInfoInHtml( -WEIGHT_INC, HAPPINESS_INC);
+    const petEl = event.data.petEl;
+    displayAction(actions.play, petEl);
+    checkAndUpdatePetInfoInHtml(null, -WEIGHT_INC, HAPPINESS_INC, petEl);
 }
 
-function clickedExerciseButton() {
+function clickedExerciseButton(event) {
     // Decrease pet happiness
     // Decrease pet weight
-    displayAction(actions.exercise, $(this));
-    checkAndUpdatePetInfoInHtml(-WEIGHT_INC, -HAPPINESS_INC);
+    const petEl = event.data.petEl;
+    displayAction(actions.exercise, petEl);
+    checkAndUpdatePetInfoInHtml(null, -WEIGHT_INC, -HAPPINESS_INC, petEl);
 }
 
-function clickedNameEditButton() {
+function clickedNameEditButton(event) {
     let clickedButton = $(this);
 
     const formEl = $(clickedButton.parent().siblings('.name-form')[0]);
@@ -109,42 +131,45 @@ function submittedNameForm(event) {
     const formEl = $(this);
     formEl.toggleClass('no-display', true); // disable form after submit
     const inputEl = formEl.find(".name-input");
+    const newName = inputEl.val();
     // update pet name
-    pet_info.name = inputEl.val();
-
     inputEl.val(""); // reset input value
     
-    updatePetInfoInHtml();
+    const petEl = event.data.petEl;
+    checkAndUpdatePetInfoInHtml(newName, 0, 0, petEl);
 }
 
 function clickedAddButton() {
-    const newPetTemplate = $('#pet-template').clone();
-    const newPetEl = $(newPetTemplate).find('.pet-container');
-
-    $('.pets-container').append(newPetEl);
+    addPet();
 }
 
 
-function checkAndUpdatePetInfoInHtml(weight_diff, happiness_diff) {
-    checkWeightAndHappinessBeforeUpdating(weight_diff, happiness_diff);
-    updatePetInfoInHtml();
+function checkAndUpdatePetInfoInHtml(name, weight_diff, happiness_diff, petEl) {
+    // get correct object in pets array
+    const petObj = pets.find((p) => p.element.is(petEl)); // compares dom elements
+    
+    checkWeightAndHappinessBeforeUpdating(name, weight_diff, happiness_diff, petObj);
+    updatePetInfoInHtml(petObj);
 }
 
 
 // updates pet_info obj
-function checkWeightAndHappinessBeforeUpdating(weight_diff, happiness_diff) {
+function checkWeightAndHappinessBeforeUpdating(name, weight_diff, happiness_diff, petObj) {
     // Add conditional so if weight is lower than zero.
-    const new_weight = pet_info.weight + weight_diff;
-    const new_happiness = pet_info.happiness + happiness_diff;
+    const new_weight = petObj.weight + weight_diff;
+    const new_happiness = petObj.happiness + happiness_diff;
 
-    pet_info.weight = new_weight > MIN_WEIGHT ? new_weight : MIN_WEIGHT;
-    pet_info.happiness = new_happiness > MIN_HAPPINESS ? new_happiness : MIN_HAPPINESS;
+    petObj.weight = new_weight > MIN_WEIGHT ? new_weight : MIN_WEIGHT;
+    petObj.happiness = new_happiness > MIN_HAPPINESS ? new_happiness : MIN_HAPPINESS;
+
+    if(name) petObj.name = name; // set name if given name is not null
+    
 }
 
 // Updates your HTML with the current values in your pet_info object
-function updatePetInfoInHtml() {
-    $('.name').text(pet_info['name']);
-    $('.weight').text(pet_info['weight']);
-    $('.happiness').text(pet_info['happiness']);
+function updatePetInfoInHtml(petObj) {
+    petObj.element.find('.name').text(petObj['name']);
+    petObj.element.find('.weight').text(petObj['weight']);
+    petObj.element.find('.happiness').text(petObj['happiness']);
 }
 
