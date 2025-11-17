@@ -122,6 +122,8 @@ function clickedNameEditButton(event) {
     const formEl = $(clickedButton.parent().siblings('.name-form')[0]);
     formEl.toggleClass('no-display');
 
+    clickedButton.text(formEl.hasClass('no-display') ? "Edit name" : "Cancel");
+
     formEl.find('.name-input').focus();
 }
 
