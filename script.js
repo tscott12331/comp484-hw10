@@ -1,15 +1,19 @@
 $(function() { // Makes sure that your function is called once all the DOM elements of the page are ready to be used.
 
-    // Called function to update the name, happiness, and weight of our pet in our HTML
+    // add a pet with some initial values
+    addPet({
+        name: "Dog",
+        weight: 5,
+        happiness: 5,
+        image: "images/doberman.png",
+    });
 
-    // When each button is clicked, it will "call" function for that button (functions are below)
-    addPet();
     $('#add-pet-button').click(clickedAddButton);
-
-
-
 })
 
+
+
+// CONSTANTS
 
 const MIN_WEIGHT = 0;
 const MIN_HAPPINESS = 0;
@@ -18,16 +22,21 @@ const INIT_NAME = "My Pet Name"
 const WEIGHT_INC = 1;
 const HAPPINESS_INC = 1;
 
+const IMG_PLACEHOLDER_SRC = 'images/placeholder.svg';
 
+
+// constant ref of an array holding all the pets that have been created
 const pets = [];
 
-// Add a variable "pet_info" equal to a object with the name (string), weight (number), and happiness (number) of your pet
+// default values for a pet object (also shows the structure of a pet object)
 const pet_info = {
     name: INIT_NAME,
     weight: MIN_WEIGHT,
     happiness: MIN_HAPPINESS,
+    image: IMG_PLACEHOLDER_SRC,
 };
 
+// pseudo enum structure representing different actions a user can take
 const actions = { // meant to be like an enum
     treat: 0,
     play: 1,
@@ -43,56 +52,87 @@ const actions = { // meant to be like an enum
 function clickedTreatButton(event) {
     // Increase pet happiness
     // Increase pet weight
+    
+    // retrieve button's containing pet element
     const petEl = event.data.petEl;
+
+    // display treat action for this pet
     displayAction(actions.treat, petEl);
-    checkAndUpdatePetInfoInHtml(null, WEIGHT_INC, HAPPINESS_INC, petEl);
+
+    // update pet info
+    checkAndUpdatePetInfoInHtml(null, null, WEIGHT_INC, HAPPINESS_INC, petEl);
 }
 
 function clickedPlayButton(event) {
     // Increase pet happiness
     // Decrease pet weight
+    
+    // retrieve button's containing pet element
     const petEl = event.data.petEl;
+
+    // display play action for this pet
     displayAction(actions.play, petEl);
-    checkAndUpdatePetInfoInHtml(null, -WEIGHT_INC, HAPPINESS_INC, petEl);
+
+    // update pet info
+    checkAndUpdatePetInfoInHtml(null, null, -WEIGHT_INC, HAPPINESS_INC, petEl);
 }
 
 function clickedExerciseButton(event) {
     // Decrease pet happiness
     // Decrease pet weight
+
+    // retrieve button's containing pet element
     const petEl = event.data.petEl;
+
+    // display exercise action for this pet
     displayAction(actions.exercise, petEl);
-    checkAndUpdatePetInfoInHtml(null, -WEIGHT_INC, -HAPPINESS_INC, petEl);
+
+    // update pet info
+    checkAndUpdatePetInfoInHtml(null, null, -WEIGHT_INC, -HAPPINESS_INC, petEl);
 }
 
 function clickedNameEditButton(event) {
+    // retrieve button's containing pet element
     const petEl = event.data.petEl;
 
-    const clickedButton = $(this);
+    // retrieve the form element
+    const formEl = petEl.find('.name-form');
 
-    const formEl = $(clickedButton.parent().siblings('.name-form')[0]);
+    // toggle the display of the edit form
     formEl.toggleClass('no-display');
 
+    // update the text within the edit button based on form display state
     updateEditButtonState(petEl);
 
+    // focus the edit input (will work when displayed)
     formEl.find('.name-input').focus();
 }
 
 function submittedNameForm(event) {
     event.preventDefault();
 
+    // retrieve form's containing pet element
     const petEl = event.data.petEl;
 
+    // retrive form that triggered this submit event
     const formEl = $(this);
-    formEl.toggleClass('no-display', true); // disable form after submit
+
+    // hide form after submit
+    formEl.toggleClass('no-display', true);
+    // update edit button based on form display state
     updateEditButtonState(petEl);
 
+    // get form input element
     const inputEl = formEl.find(".name-input");
+    // get user typed name
     const newName = inputEl.val();
-    // update pet name
-    inputEl.val(""); // reset input value
+    // reset input value
+    inputEl.val("");
     
-    checkAndUpdatePetInfoInHtml(newName, 0, 0, petEl);
+    // update pet name
+    checkAndUpdatePetInfoInHtml(newName, null, 0, 0, petEl);
 
+    // display name change action for this pet
     displayAction(actions.changeName, petEl);
 }
 
@@ -101,32 +141,44 @@ function clickedAddButton() {
 }
 
 function mouseEnteredImageContainer(event) {
+    // retrieve image container's containing pet element
     const petEl = event.data.petEl;
+
+    // get label surrounding image input
     const editLabel = petEl.find('.img-edit-label');
 
+    // enable image input display
     editLabel.toggleClass('no-display', false); // show label
 }
 
 function mouseLeftImageContainer(event) {
+    // retrieve image container's containing pet element
     const petEl = event.data.petEl;
+    // get label surrounding image input
     const editLabel = petEl.find('.img-edit-label');
 
+    // enable image input display
     editLabel.toggleClass('no-display', true); // show label
 }
 
 function changedImageEditValue(event) {
+    // get image file that user input
     const file = event.target.files[0];
-    if(!file) return; // no file
+    if(!file) return; // no file, don't try to create url
 
+    // retrieve image input's containing pet element
+    const petEl = event.data.petEl;
+
+    // create src url for inputted image
     const url = URL.createObjectURL(file);
 
-    const petEl = event.data.petEl;
-    const petImage = petEl.find('.pet-image');
-
-    petImage.attr('src', url);
-
+    // update pet image
+    checkAndUpdatePetInfoInHtml(null, url, 0, 0, petEl);
+    
+    // display image change action for this pet
     displayAction(actions.changeImage, petEl);
 }
+
 
 
 
@@ -136,22 +188,33 @@ function updateEditButtonState(petEl) {
     const clickedButton = petEl.find('.name-edit-button');
     const formEl = petEl.find('.name-form');
 
+    // update the text of the edit button based on the form's display
     clickedButton.text(formEl.hasClass('no-display') ? "Edit name" : "Cancel");
 }
 
 
-function addPet() {
-    const newPetTemplate = $('#pet-template').clone();
-    const newPetEl = $(newPetTemplate).find('.pet-container');
+function addPet(init_info) {
+    // use init_info if it exists
+    const newPetInfo = init_info ?? pet_info;
 
+    // clone hidden template in DOM
+    const newPetTemplate = $('#pet-template').clone();
+
+    // get the actual content within the clone and append it
+    const newPetEl = $(newPetTemplate).find('.pet-container');
     $('.pets-container').append(newPetEl);
 
+    // create new pet object
     const newPet = {
-        element: newPetEl,
-        ...pet_info // copy default pet info
+        element: newPetEl, // ref to dom element
+        ...newPetInfo // copy pet info
     };
 
+    // push pet object to pets array
     pets.push(newPet);
+
+    // update pet info in html
+    checkAndUpdatePetInfoInHtml(null, null, 0, 0, newPet.element);
 
     // set event listeners for this specific pet element
 
@@ -165,14 +228,14 @@ function addPet() {
     newPetEl.find('.pet-image-container').on('mouseleave', { petEl: newPetEl }, mouseLeftImageContainer);
 
     newPetEl.find('.img-edit-input').on('change', { petEl: newPetEl }, changedImageEditValue);
-
-    checkAndUpdatePetInfoInHtml(newPet.name, 0, 0, newPet.element);
 }
 
 
 function displayAction(action, petEl) {
+    // get the pet element's action indicator
     const actionIndicatorEl = petEl.find('.action-indicator');
     
+    // display different text for different actions
     switch(action) {
         case actions.treat:
             actionIndicatorEl.text('Yum!');
@@ -191,10 +254,14 @@ function displayAction(action, petEl) {
             break;
     }
 
+    // ensure that when an action occurs, the indicator is showing
     actionIndicatorEl.toggleClass('no-display', false);
     actionIndicatorEl.css('opacity', '100%');
+
+    // stop any animations this indicator is performing
     actionIndicatorEl.stop(true, false);
 
+    // perform fade animation to make indicator dissapear after 1.2 seconds
     actionIndicatorEl.fadeTo(1200, 0, () => {
         actionIndicatorEl.toggleClass('no-display', true);
         actionIndicatorEl.css('opacity', '100%');
@@ -202,32 +269,38 @@ function displayAction(action, petEl) {
 }
 
 
-function checkAndUpdatePetInfoInHtml(name, weight_diff, happiness_diff, petEl) {
+function checkAndUpdatePetInfoInHtml(name, image, weight_diff, happiness_diff, petEl) {
     // get correct object in pets array
     const petObj = pets.find((p) => p.element.is(petEl)); // compares dom elements
     
-    checkWeightAndHappinessBeforeUpdating(name, weight_diff, happiness_diff, petObj);
+    // make sure pet object gets updated correctly
+    checkWeightAndHappinessBeforeUpdating(name, image, weight_diff, happiness_diff, petObj);
+    // update html based on pet object
     updatePetInfoInHtml(petObj);
 }
 
 
 // updates pet_info obj
-function checkWeightAndHappinessBeforeUpdating(name, weight_diff, happiness_diff, petObj) {
-    // Add conditional so if weight is lower than zero.
+function checkWeightAndHappinessBeforeUpdating(name, image, weight_diff, happiness_diff, petObj) {
+    // calculate new weight and happiness based on diffs
     const new_weight = petObj.weight + weight_diff;
     const new_happiness = petObj.happiness + happiness_diff;
 
+    // make sure weight and happiness don't go below min (0)
     petObj.weight = new_weight > MIN_WEIGHT ? new_weight : MIN_WEIGHT;
     petObj.happiness = new_happiness > MIN_HAPPINESS ? new_happiness : MIN_HAPPINESS;
 
     if(name) petObj.name = name; // set name if given name is not null
+    if(image) petObj.image = image; // set image if given image is not null
     
 }
 
 // Updates your HTML with the current values in your pet_info object
 function updatePetInfoInHtml(petObj) {
-    petObj.element.find('.name').text(petObj['name']);
-    petObj.element.find('.weight').text(petObj['weight']);
-    petObj.element.find('.happiness').text(petObj['happiness']);
+    // set text and attributes of elements accordingly
+    petObj.element.find('.name').text(petObj.name);
+    petObj.element.find('.weight').text(petObj.weight);
+    petObj.element.find('.happiness').text(petObj.happiness);
+    petObj.element.find('.pet-image').attr('src', petObj.image);
 }
 
