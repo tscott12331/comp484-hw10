@@ -202,6 +202,17 @@ function addPet(initInfo) {
 
     // get the actual content within the clone and append it
     const newPetEl = $(newPetTemplate).find('.pet-container');
+
+    /*
+        * SIGNED UP METHOD .append()
+        * This method appends the passed in element to child elements
+        * of the caller.
+        *
+        * In this case, the caller is the ".pets-container" and the
+        * passd in element is "newPetEl."
+        *
+        * I used this method to append new pet elements to the ".pets-container"
+    */
     $('.pets-container').append(newPetEl);
 
     // create new pet object
@@ -262,6 +273,17 @@ function displayAction(action, petEl) {
     actionIndicatorEl.stop(true, false);
 
     // perform fade animation to make indicator dissapear after 1.2 seconds
+    /*
+        * SIGNED UP METHOD .fadeTo
+        * This method performs a fade animation on the caller with some options.
+        *
+        * You can specify the duration of the animation, how much you want the
+        * element to fade, the animation easing, and a callback function that is
+        * executed when the animation finishes.
+        *
+        * I used this method to fade out the action indicator after it displays
+        * an action that the user took.
+    */
     actionIndicatorEl.fadeTo(1200, 0, () => {
         actionIndicatorEl.toggleClass('no-display', true);
         actionIndicatorEl.css('opacity', '100%');
