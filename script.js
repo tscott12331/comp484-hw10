@@ -121,13 +121,22 @@ function clickedExerciseButton(event) {
     checkAndUpdatePetInfoInHtml(null, -WEIGHT_INC, -HAPPINESS_INC, petEl);
 }
 
+function updateEditButtonState(petEl) {
+    const clickedButton = petEl.find('.name-edit-button');
+    const formEl = petEl.find('.name-form');
+
+    clickedButton.text(formEl.hasClass('no-display') ? "Edit name" : "Cancel");
+}
+
 function clickedNameEditButton(event) {
-    let clickedButton = $(this);
+    const petEl = event.data.petEl;
+
+    const clickedButton = $(this);
 
     const formEl = $(clickedButton.parent().siblings('.name-form')[0]);
     formEl.toggleClass('no-display');
 
-    clickedButton.text(formEl.hasClass('no-display') ? "Edit name" : "Cancel");
+    updateEditButtonState(petEl);
 
     formEl.find('.name-input').focus();
 }
@@ -135,14 +144,17 @@ function clickedNameEditButton(event) {
 function submittedNameForm(event) {
     event.preventDefault();
 
+    const petEl = event.data.petEl;
+
     const formEl = $(this);
     formEl.toggleClass('no-display', true); // disable form after submit
+    updateEditButtonState(petEl);
+
     const inputEl = formEl.find(".name-input");
     const newName = inputEl.val();
     // update pet name
     inputEl.val(""); // reset input value
     
-    const petEl = event.data.petEl;
     checkAndUpdatePetInfoInHtml(newName, 0, 0, petEl);
 }
 

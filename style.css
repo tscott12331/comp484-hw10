@@ -1,48 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
     box-sizing: border-box;
 }
 
-body {
-    font-family: helvetica, arial, sans-serif;
-    margin: 25px;
+:root {
+    --c-amber-100: oklch(96.2% 0.059 95.617);
+
+    --c-zinc-100: oklch(96.7% 0.001 286.375);
+    --c-zinc-200: oklch(92% 0.004 286.32);
+
+    --c-zinc-400: oklch(70.5% 0.015 286.067);
+    --c-zinc-500: oklch(55.2% 0.016 285.938);
+    --c-zinc-600: oklch(44.2% 0.017 285.786);
+    --c-zinc-700: oklch(37% 0.013 285.805);
+    --c-zinc-800: oklch(27.4% 0.006 286.033);
+    --c-zinc-900: oklch(21% 0.006 285.885);
+
+    --c-sky-50: oklch(97.7% 0.013 236.62);
+    --c-sky-400: oklch(74.6% 0.16 232.661);
+    --c-sky-900: oklch(39.1% 0.09 240.876);
+    
+    --c-lime-800: oklch(45.3% 0.124 130.933);
+    --c-lime-900: oklch(40.5% 0.101 131.063);
+
+    --bg-1: var(--c-zinc-600);
+    --bg-2: var(--c-zinc-700);
+    --bg-3: var(--c-zinc-800);
+
+    --accent-1: var(--c-zinc-500);
+    --accent-2: var(--c-zinc-400);
+
+    --text-col-1: var(--c-zinc-100);
+    --text-col-2: var(--c-zinc-200);
+
+    background: 
+        linear-gradient(20deg, 
+        var(--bg-3) 0%, 
+        var(--bg-2) 5%, 
+        var(--bg-1) 20%, 
+        var(--bg-2) 80%, 
+        var(--bg-3) 95%);
+
+    color: var(--text-col-1);
+
+    height: 100%;
+
+    font-family: "Work Sans", sans-serif;
+
+    overflow: hidden;
 }
 
-main {
-    display:block;
-    height:175px;
+body {
+    margin: 0;
+    padding: 25px;
+    height: 100%;
+    overflow-y: auto;
 }
 
 header {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--accent-1);
+    margin-bottom: 20px;
 }
 
 h1 {
-    font-weight: bold;
-    color: #000;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-p {
-    max-width: 600px;
-}
-
-
-li {
-    margin-bottom: 5px;
-}
-
-footer {
-    padding-top: 25px;
-    border-top: 1px solid black;
-}
-
-footer a {
-    float:left;
-    margin:5px;
+    margin-top: 0;
 }
 
 button {
@@ -51,10 +73,31 @@ button {
     cursor:pointer;
 
     outline: none;
+    
+    padding: 5px;
+}
+
+button:hover {
+    background: var(--bg-3);
+    outline: 1px solid var(--accent-2);
 }
 
 input, button {
     font-family: inherit;
+    background: var(--bg-2);
+    color: var(--text-col-2);
+
+    border: 1px solid var(--accent-1);
+    border-radius: 2px;
+}
+
+input {
+    padding: 2px;
+    outline: none;
+}
+
+input:focus {
+    outline: 1px solid var(--accent-2);
 }
 
 #pet-template {
@@ -68,12 +111,13 @@ input, button {
     flex-wrap: wrap;
     gap: 15px;
     margin: 10px;
+    margin-left: 0;
     margin-bottom: 30px;
 }
 
 .pet-image {
     height:250px;
-    border: 2px solid oklch(21.6% 0.006 56.043);
+    border: 2px solid var(--accent-2);
 }
 
 .pet-image-container {
@@ -85,13 +129,16 @@ input, button {
     top: 5px;
     right: 5px;
 
-    background: oklch(28.2% 0.091 267.935 / 0.8);
-    color: oklch(98.5% 0.001 106.423);
+    background: color-mix(in lch, var(--bg-2) 50%, transparent 20%);
+    color: var(--text-col-2);
 
-    display: block;
-    padding: 4px;
+    border: 1px solid var(--accent-1);
+    border-radius: 2px;
+}
 
-    border-radius: 4px;
+.img-edit-label:hover {
+    background: var(--bg-3);
+    outline: 1px solid var(--accent-2);
 }
 
 .action-indicator {
@@ -99,9 +146,16 @@ input, button {
     position: absolute;
     left: 5px;
     bottom: 9px;
+
+    background: color-mix(in lch, var(--c-lime-900) 70%, transparent 20%);
+    /* mix-blend-mode:hard-light; */
+    border: 1px solid var(--accent-1);
+}
+
+.img-edit-label, .action-indicator {
+    backdrop-filter: blur(5px) contrast(2);
     
-    background: linear-gradient(oklch(72.3% 0.219 149.579 / .9), oklch(37.8% 0.077 168.94 / .7));
-    color: oklch(98.5% 0.001 106.423);
+
     padding: 4px;
 
     border-radius: 4px;
@@ -119,6 +173,7 @@ input, button {
 
 .pet-name-and-button > button {
     font-size: 12px;
+    padding: 4px;
 }
 
 .button-container {
@@ -131,14 +186,6 @@ input, button {
 
 .button-container button {
     width: 100px;
-    text-align: center;
-    display: inline-block;
-    font-size:15px;
-    background-color: #1e2835;
-    border-color: #404853;
-    cursor:pointer;
-    background-image: linear-gradient(to bottom,rgba(246,246,246,.1)0%,rgba(30,40,53,0)66%);
-    color: #fafafa;
 }
 
 .info-container {
