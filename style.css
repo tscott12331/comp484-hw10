@@ -1,10 +1,15 @@
+/* import google fonts font */
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 
 * {
     box-sizing: border-box;
 }
 
 :root {
+    /* colors were obtained from tailwind site, 
+     * hence the usage of oklch
+     * */
     --c-amber-100: oklch(96.2% 0.059 95.617);
 
     --c-zinc-100: oklch(96.7% 0.001 286.375);
@@ -34,6 +39,7 @@
     --text-col-1: var(--c-zinc-100);
     --text-col-2: var(--c-zinc-200);
 
+    /* give bg a gradient based on main bg colors */
     background: 
         linear-gradient(20deg, 
         var(--bg-3) 0%, 
@@ -48,6 +54,7 @@
 
     font-family: "Work Sans", sans-serif;
 
+    /* handle overflow elsewhere to prevent weird gradient problems */
     overflow: hidden;
 }
 
@@ -55,6 +62,7 @@ body {
     margin: 0;
     padding: 25px;
     height: 100%;
+    /* handle overflow here */
     overflow-y: auto;
 }
 
@@ -77,11 +85,13 @@ button {
     padding: 5px;
 }
 
+/* give buttons outline and different bg on hover */
 button:hover {
     background: var(--bg-3);
     outline: 1px solid var(--accent-2);
 }
 
+/* inputs and buttons will look similar */
 input, button {
     font-family: inherit;
     background: var(--bg-2);
@@ -96,6 +106,7 @@ input {
     outline: none;
 }
 
+/* outline input when focused */
 input:focus {
     outline: 1px solid var(--accent-2);
 }
@@ -104,10 +115,12 @@ input:focus {
     display: none;
 }
 
+/* per each pet container */
 .pet-container {
     display: flex;
     align-items: center;
 
+    /* wrap content for smaller screen sizes */
     flex-wrap: wrap;
     gap: 15px;
     margin: 10px;
@@ -120,15 +133,19 @@ input:focus {
     border: 2px solid var(--accent-2);
 }
 
+/* make relative in order to position
+ * action indicator and image edit input */
 .pet-image-container {
     position: relative;
 }
 
 .img-edit-label {
+    /* position at top right of image container */
     position: absolute;
     top: 5px;
     right: 5px;
 
+    /* give bg-2 some transparency */
     background: color-mix(in lch, var(--bg-2) 60%, transparent 10%);
     color: var(--text-col-2);
 
@@ -139,22 +156,27 @@ input:focus {
 }
 
 .img-edit-label:hover {
+    /* give bg-3 some transparency */
     background: color-mix(in lch, var(--bg-3) 70%, transparent 10%);
     outline: 1px solid var(--accent-2);
 }
 
 .action-indicator {
     margin: 0;
+
+    /* position in bottom left of image container */
     position: absolute;
     left: 5px;
     bottom: 9px;
 
+    /* give lime color some transparency */
     background: color-mix(in lch, var(--c-lime-900) 70%, transparent 20%);
     /* mix-blend-mode:hard-light; */
     border: 1px solid var(--accent-1);
 }
 
 .img-edit-label, .action-indicator {
+    /* blur background of these transparent objects */
     backdrop-filter: blur(5px) contrast(2);
     
 
@@ -198,6 +220,7 @@ input:focus {
 
 
 
+/* utility for removing object's display */
 .no-display {
     display: none;
 }
