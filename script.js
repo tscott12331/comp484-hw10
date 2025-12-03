@@ -15,8 +15,14 @@ $(function() { // Makes sure that your function is called once all the DOM eleme
 
 // CONSTANTS
 
+/***********BUG INTRODUCED HERE*************/
+/***********SHOULD BE NUMBERS***************/
+// const MIN_WEIGHT = "0";
+// const MIN_HAPPINESS = "0";
+/***********BUG FIX HERE********************/
 const MIN_WEIGHT = 0;
 const MIN_HAPPINESS = 0;
+/*******************************************/
 const INIT_NAME = "My Pet Name"
 
 const WEIGHT_INC = 1;
